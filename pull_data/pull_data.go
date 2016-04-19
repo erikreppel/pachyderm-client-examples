@@ -4,13 +4,14 @@ import (
     "log"
     "github.com/pachyderm/pachyderm/src/client"
     "github.com/pachyderm/pachyderm/src/client/pfs"
+    "os"
 )
 
 func main() {
     // Connect to Pachyderm
     // That IP is probably not constant, run `kubectl get all`
     // and see what IP pachd is running at
-    apiClient, err := client.NewFromAddress("10.0.0.115:650")
+    apiClient, err := client.NewFromAddress("10.0.0.244:650")
     if err != nil{
         log.Fatal("Error:", err)
     }
@@ -39,12 +40,17 @@ func main() {
                                        false)
     if err != nil { log.Fatal(err) }
     
-    log.Println("Commits in", repo, ":", repoCommits)
+    log.Println("Commits in", repo, ":", len(repoCommits))
     
+    if len(repoCommits) == 0 {
+       log.Println("There are no commits in this repo")
+       os.Exit(1)
+    }
     commitID := repoCommits[0].Commit.ID
     
-    // Lets get some files
     log.Println("Getting files from commit", commitID, "in", repo)
+    // Lets get some files
+    
     
     // First we have to inspect a file to get the shard, we need a list of files
     // Need to figure out how to get a shard
