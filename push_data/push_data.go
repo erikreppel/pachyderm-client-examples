@@ -4,6 +4,8 @@ import (
     "log"
     "github.com/pachyderm/pachyderm/src/client"
     "github.com/pachyderm/pachyderm/src/client/pfs"
+    "io/ioutil"
+    "path"
 )
 
 func shard() *pfs.Shard {
@@ -41,9 +43,31 @@ func main() {
     var parentCommitID string
     commit, err := pfs.StartCommit(apiClient, repoName, parentCommitID, branch)
     if err != nil {
-        log.Fatal("Failed to start commit")
-
+        log.Fatal("Failed to start commit\n")
     }
+    
+    commitID := commit.ID
+    log.Println("Commit ID:", commitID)
+    
+    log.Println(commit)
+    // _, err = pfs.PutFile(apiClient, repoName, commitID, "push_data/test_data.txt", os.Stdin)
+    
+    // if err != nil {
+    //     log.Println(err)
+    // }
+    
+    fileName := "hello_world.txt"
+    path := path.Join("/pfs", repoName, commitID, fileName)
+    
+    message := []byte("hello World\n")
+    err = ioutil.WriteFile(path, message, 0644)
+    
+    log.Println("Successfully inserted a File")
+    
+    pfs.FinishCommit(apiClient, repoName, commitID)
+    
+    
+    
     
 }
 
