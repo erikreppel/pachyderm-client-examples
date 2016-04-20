@@ -5,6 +5,7 @@ import (
     "github.com/pachyderm/pachyderm/src/client"
     "github.com/pachyderm/pachyderm/src/client/pfs"
     "io/ioutil"
+    "os"
     "path"
 )
 
@@ -45,10 +46,15 @@ func main() {
         log.Fatal(err)
     }
     
+    
     commitID := commit.ID
     log.Println(commit)
+
+    defer pfs.FinishCommit(apiClient, repoName, commitID)
+
     
-    fileName := "hello_world.txt"
+    // Upload new file
+    fileName := "test_data.txt"
     path := path.Join("/pfs", repoName, commitID, fileName)
     
     message := []byte("hello World\n")
@@ -56,9 +62,16 @@ func main() {
     if err != nil { log.Fatal(err) }
     
     log.Println("Successfully inserted a File")
-    pfs.FinishCommit(apiClient, repoName, commitID)
     
-    log.Println("Finished commit")
+    // Put file flat out doesnt work
+    // _, err = pfs.PutFile(apiClient, repoName, commitID,
+    //                      path, os.Stdout)
+    // if err != nil { log.Fatal(err) }
+    
+    log.Println("Successfully put a File")
+    
+    
+    
     
     
     
