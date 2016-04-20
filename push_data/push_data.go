@@ -22,7 +22,6 @@ func shard() *pfs.Shard {
 }
 
 func main() {
-
     apiClient, err := client.NewFromAddress("10.0.0.244:650")
     if err != nil { log.Fatal(err) }
     
@@ -43,29 +42,23 @@ func main() {
     var parentCommitID string
     commit, err := pfs.StartCommit(apiClient, repoName, parentCommitID, branch)
     if err != nil {
-        log.Fatal("Failed to start commit\n")
+        log.Fatal(err)
     }
     
     commitID := commit.ID
-    log.Println("Commit ID:", commitID)
-    
     log.Println(commit)
-    // _, err = pfs.PutFile(apiClient, repoName, commitID, "push_data/test_data.txt", os.Stdin)
-    
-    // if err != nil {
-    //     log.Println(err)
-    // }
     
     fileName := "hello_world.txt"
     path := path.Join("/pfs", repoName, commitID, fileName)
     
     message := []byte("hello World\n")
     err = ioutil.WriteFile(path, message, 0644)
+    if err != nil { log.Fatal(err) }
     
     log.Println("Successfully inserted a File")
-    
     pfs.FinishCommit(apiClient, repoName, commitID)
     
+    log.Println("Finished commit")
     
     
     
